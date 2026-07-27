@@ -5,11 +5,11 @@
 # Site
 title: zhang的博客
 subtitle: ''
-description: ''
+description: '一些分享、记录、思考、学习等'
 keywords:
 author: zhang
 language: zh-CN
-timezone: ''
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'

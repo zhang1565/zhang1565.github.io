@@ -6,7 +6,8 @@ tags:
   - GitHub
   - 博客
 categories:
-  - 教程
+  - 博客搭建学习
+    - Hexo
 ---
 
 ## 前言
