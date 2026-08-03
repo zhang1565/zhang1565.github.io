@@ -1,0 +1,97 @@
+/* ===== 首页卡片背景色 ===== */
+
+/* 主页文章轮播页面 */
+#recent-posts > .recent-post-item {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 主页文章列表页面卡片 */
+#recent-posts > .recent-post-items .recent-post-item {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ===== 侧边栏卡片背景色 ===== */
+.card-widget {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 个人信息 Follow me 按钮 */
+#aside-content > .card-widget.card-info > #card-info-btn {
+  background-color: rgba(112, 25, 194, 0.97);
+  border-radius: 8px;
+}
+
+/* ===== 导航栏背景色 ===== */
+.nav-fixed > #nav {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ===== 文章页面背景色 ===== */
+.layout > #post {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ===== 分类页面背景色 ===== */
+.layout > #page {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* ===== 归档页面背景色 ===== */
+.layout > #archive {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ===== 分类详情页背景色 ===== */
+.layout > #category {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ===== 标签详情页背景色 ===== */
+.layout > #tag {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* ===== 暗色模式适配 ===== */
+[data-theme="dark"] .card-widget {
+  background: rgba(45, 10, 61, 0.5) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .nav-fixed > #nav {
+  background: rgba(45, 10, 61, 0.5) !important;
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] #recent-posts > .recent-post-item {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+[data-theme="dark"] #recent-posts > .recent-post-items .recent-post-item {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+[data-theme="dark"] .layout > #post {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+[data-theme="dark"] .layout > #page {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+[data-theme="dark"] .layout > #archive {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+[data-theme="dark"] .layout > #category {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+[data-theme="dark"] .layout > #tag {
+  background: rgba(45, 10, 61, 0.5) !important;
+}
+
+/* ===== 布局优化 ===== */
+.layout.hide-aside {
+  max-width: 1600px;
+}

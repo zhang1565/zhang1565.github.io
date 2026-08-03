@@ -1,0 +1,39 @@
+- class_name: 友情链接
+  class_desc: 大佬笔记
+  link_list:
+    - name: Fred's Blog
+      link: https://fredqinhz.github.io/
+      avatar: https://fredqin.oss-cn-shanghai.aliyuncs.com/others/avatar.jpg
+      descr: 一个非常厉害的钓鱼高手
+
+- class_name: Hexo博客
+  class_desc: 使用Hexo搭建的优秀博客
+  link_list:
+    - name: Butterfly主题
+      link: https://butterfly.js.org/
+      avatar: https://butterfly.js.org/img/butterfly-icon.png
+      descr: 一款优雅的Hexo主题
+    - name: Hexo官方
+      link: https://hexo.io/
+      avatar: https://hexo.io/favicon.ico
+      descr: 快速、简洁且高效的博客框架
+    - name: Butterfly 主题美化
+      link: https://blog.haiyong.site/post/22e1d5da.html
+      avatar: https://blog.haiyong.site/img/favicon.png
+      descr: 美化指南
+
+- class_name: 官网资源
+  class_desc: 一些优秀的官网资源
+  link_list:
+    - name: GitHub
+      link: https://github.com/
+      avatar: https://github.githubassets.com/favicons/favicon.svg
+      descr: 全球最大的代码托管平台
+    - name: CodePen
+      link: https://codepen.io/
+      avatar: https://codepen.io/favicon.ico
+      descr: 前端代码在线编辑与分享
+    - name: Can I Use
+      link: https://caniuse.com/
+      avatar: https://caniuse.com/favicon.ico
+      descr: 浏览器兼容性查询

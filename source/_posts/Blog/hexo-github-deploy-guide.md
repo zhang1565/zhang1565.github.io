@@ -1,6 +1,7 @@
 ---
 title: Hexo 博客搭建与 GitHub Pages 部署教程
 date: 2026-07-26
+top_img: false
 tags:
   - Hexo
   - GitHub

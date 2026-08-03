@@ -1,6 +1,7 @@
 ---
 title: Butterfly 主题菜单配置详解
 date: 2026-07-27
+top_img: false
 tags:
   - Butterfly
   - 菜单配置
