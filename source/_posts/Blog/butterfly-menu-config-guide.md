@@ -1,14 +1,15 @@
 ---
 title: Butterfly 主题菜单配置详解
-date: 2026-07-27
 top_img: false
 tags:
   - Butterfly
   - 菜单配置
   - 主题设置
 categories:
-  - 博客搭建学习
-    - Butterfly主题
+  - 博客搭建学习 - Butterfly主题
+abbrlink: 6351eaff
+date: 2026-07-27 00:00:00
+cover: /img/butterfly-icon.png
 ---
 
 ## 前言

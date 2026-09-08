@@ -1,14 +1,14 @@
 ---
 title: Hexo 博客搭建与 GitHub Pages 部署教程
-date: 2026-07-26
 top_img: false
 tags:
   - Hexo
   - GitHub
   - 博客
 categories:
-  - 博客搭建学习
-    - Hexo
+  - 博客搭建学习 - Hexo
+abbrlink: 2e72ceab
+date: 2026-07-26 00:00:00
 ---
 
 ## 前言

@@ -1,13 +1,14 @@
 ---
 title: JavaScript
-date: 2026-07-30
 top_img: false
 tags:
   - JavaScript
   - 前端开发
 categories:
-  - 前端开发
-    - JavaScript
+  - 前端开发 - JavaScript
+abbrlink: cc1b9611
+date: 2026-07-30 00:00:00
+cover: /img/js.jpeg
 ---
 
 ### 1.变量类型分为`基础类型(原始类型)`和`引用类型(对象类型)`,分别是哪些? 区别是什么?
