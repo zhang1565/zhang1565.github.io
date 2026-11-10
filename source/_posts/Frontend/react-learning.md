@@ -308,3 +308,170 @@ startTransition(() => {
   setResult(hugeList.filter(item => item.includes(keyword))); // 不阻塞键盘输入
 });
 ```
+
+### 20. Redux 和 Redux Toolkit 学习笔记
+
+#### Store、state、action 和 reducer 怎么配合？
+
+Redux 可以集中管理多个组件需要读写的状态。只在单个组件使用的状态，例如某个弹窗是否打开，仍可以交给 `useState`。React 的 `useReducer` 和 Redux 使用相似的更新模型，前者管理组件自己的状态，后者通过独立的 store 保存状态，供订阅者读取。
+
+| 概念 | 作用 | 例子 |
+| --- | --- | --- |
+| `store` | 保存当前状态，提供读取、分发和订阅的入口 | `store.getState()` |
+| `state` | 仓库当前保存的数据 | `{ counter: { value: 0 } }` |
+| `action` | 描述发生的事情及相关数据的对象 | `{ type: 'counter/add', payload: 2 }` |
+| `action creator` | 创建 action 的函数 | `add(2)` |
+| `dispatch` | 把 action 交给 store | `store.dispatch(add(2))` |
+| `reducer` | 根据旧状态和 action 计算下一份状态 | `counterReducer(state, action)` |
+| `selector` | 从状态中取值或计算派生数据的函数 | `(state) => state.counter.value` |
+
+以计数器为例，先用普通 JavaScript 看清 action creator 和 reducer 的区别。
+
+```js
+function add(amount) {
+  return { type: 'counter/add', payload: amount };
+}
+
+function counterReducer(state = { value: 0 }, action) {
+  if (action.type === 'counter/add') {
+    return { ...state, value: state.value + action.payload };
+  }
+  return state;
+}
+```
+
+`add(2)` 只生成一个对象。`dispatch(add(2))` 才把它交给仓库处理，直接写 `dispatch({ type: 'counter/add', payload: 2 })` 也可以。Redux 调用 reducer，把它返回的新状态保存起来，然后通知订阅者。普通 reducer 应保持纯函数，按输入计算结果，更新对象时返回新对象。请求、定时器等副作用放在 reducer 外面。
+
+#### 为什么 configureStore 只注册 slice 的 reducer？
+
+`createSlice` 把一块状态的初始值和更新规则写在一起，并生成 `slice.reducer` 和 `slice.actions`。仓库用 reducer 初始化和更新状态，发起操作的代码用 action creator 生成消息。
+
+```js
+import { configureStore, createSlice } from '@reduxjs/toolkit';
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0 },
+  reducers: {
+    add(state, action) {
+      state.value += action.payload;
+    },
+  },
+});
+
+export const { add } = counterSlice.actions;
+
+export const store = configureStore({
+  reducer: {
+    counter: counterSlice.reducer,
+  },
+});
+
+export const selectCount = (state) => state.counter.value;
+```
+
+**`counter: counterSlice.reducer` 可以读成「仓库里 `counter` 这一格的数据，由这个 reducer 算」。**
+
+1. 创建仓库时，计数器还没有旧状态。Redux 用 `undefined` 调用这个 reducer，得到 `initialState`，于是整个状态是 `{ counter: { value: 0 } }`。
+2. 执行 `store.dispatch(add(2))` 时，Redux 把当前的 `state.counter` 和 action 交给计数器 reducer，得到 `{ value: 2 }`，再放回 `counter` 这一格。
+3. `add` 由调用方执行。等 action 到达仓库时，它已经是 `{ type: 'counter/add', payload: 2 }`，所以仓库只需要注册负责处理它的 reducer。
+
+如果同时注册 `counter` 和 `cart`，Redux 会把同一条 action 和各自的那块状态交给两个 reducer，再把结果组合为根状态。各 reducer 可以响应自己关心的 action。注册键决定状态路径，slice 的 `name` 决定它自动生成的 action 类型前缀。把注册键改成 `score`，读取路径就变成 `state.score.value`，而 `add(2)` 的类型仍是 `counter/add`。
+
+`state.value += action.payload` 是 Redux Toolkit 通过 Immer 提供的草稿写法。它根据对草稿的修改生成新的状态。调用方仍应把 `store.getState()` 返回的状态当作只读数据。
+
+#### React 组件怎么读写 Redux？
+
+```jsx
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { add, selectCount, store } from './counterStore';
+
+function Counter() {
+  const count = useSelector(selectCount);
+  const dispatch = useDispatch();
+
+  return (
+    <button onClick={() => dispatch(add(2))}>
+      当前计数：{count}，点击加 2
+    </button>
+  );
+}
+
+export default function App() {
+  return (
+    <Provider store={store}>
+      <Counter />
+    </Provider>
+  );
+}
+```
+
+`Provider` 让内部组件访问这个 store。`useDispatch()` 取得发送操作的函数，点击时才通过 `dispatch(add(2))` 发出 action。`useSelector(selectCount)` 运行取值函数并订阅仓库，选中的值变化后会触发组件更新。`selector` 也能直接用在普通 JS 里，例如 `selectCount(store.getState())`。项目中的 `useAppDispatch`、`useAppSelector` 通常是添加了类型的封装。
+
+#### createAsyncThunk 和 extraReducers 怎么配合？
+
+如果计数器的初始值要从接口读取，可以在创建 slice 前定义一个异步任务，并在 slice 中添加处理规则。
+
+```js
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+const loadCount = createAsyncThunk('counter/load', async () => {
+  const response = await fetch('/api/counter');
+  if (!response.ok) throw new Error('读取计数失败');
+  const data = await response.json();
+  return data.value;
+});
+```
+
+`loadCount()` 生成一个任务函数。`dispatch(loadCount())` 将它交给 Redux Toolkit 默认配置的 thunk 中间件执行。任务启动后会发出 `pending`，然后根据结果发出 `fulfilled` 或 `rejected`。`counter/load` 是 action 类型前缀，真正的请求地址在 `fetch` 里。
+
+| 阶段 | 对应的 action 类型 | 常见的状态更新 |
+| --- | --- | --- |
+| `pending` | `counter/load/pending` | 设置 `loading = true`，清空旧错误 |
+| `fulfilled` | `counter/load/fulfilled` | 从 `action.payload` 取结果，结束加载 |
+| `rejected` | `counter/load/rejected` | 从 `action.error.message` 取错误文案，结束加载 |
+
+把下面的 `extraReducers` 放进计数器的 `createSlice` 配置，并把初始状态扩展为 `{ value: 0, loading: false, error: null }`。每个 `addCase` 都是在登记「收到某种 action 后怎么更新这块状态」。
+
+```js
+extraReducers: (builder) => {
+  builder
+    .addCase(loadCount.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(loadCount.fulfilled, (state, action) => {
+      state.value = action.payload;
+      state.loading = false;
+    })
+    .addCase(loadCount.rejected, (state, action) => {
+      state.error = action.error.message ?? '读取计数失败';
+      state.loading = false;
+    });
+},
+```
+
+`reducers` 会为定义的操作生成 action creator，`extraReducers` 则为已经定义好的 action 登记处理逻辑。异步任务的三个阶段已经由 `createAsyncThunk` 定义，可以直接用 `loadCount.pending` 等注册规则。
+
+当筛选或翻页可能连续发起多次请求时，可以在 `pending` 中记住 `action.meta.requestId`，在 `fulfilled` 和 `rejected` 中先比较编号。只让编号匹配最新请求的结果更新状态，避免第 1 页比第 2 页更晚返回时覆盖表格。
+
+#### 列表查询 Hook 和 Redux 各负责哪一段？
+
+列表 Hook 可以保存页码和筛选条件，负责「什么时候查」。例如翻页函数先更新 `query`，`useEffect` 再用新的查询条件调用 `fetcher(query)`。页面传入的 `fetcher` 决定「怎么查」，可以调用 `dispatch(fetchList(query))`。Redux 中的 reducer 决定「查完把结果存到哪里」。这三段可以独立组织，列表结果也可以由组件自己的状态保存。
+
+如果 `fetcher` 是 Effect 的依赖，`useCallback` 可以让它在依赖未变化时保持同一个引用。这样 Redux 更新列表并触发页面渲染时，只要查询条件、刷新信号和 `fetcher` 都没变，Effect 就不会因为这次渲染重复请求。`fetcher` 的 `query` 是调用时传入的参数，实际值来自 Hook 调用 `fetcher(query)` 的那一刻。
+
+#### 常见库和调试工具
+
+| 名称 | 在实际代码里的职责 |
+| --- | --- |
+| Redux | 提供 store、dispatch、reducer 和订阅的基础机制 |
+| Redux Toolkit（RTK） | 提供 `configureStore`、`createSlice`、`createAsyncThunk` 等工具 |
+| React Redux | 用 `Provider`、`useDispatch`、`useSelector` 把 Redux 接到 React |
+| Redux Thunk | 让 `dispatch` 能接收并执行任务函数，RTK 默认配置 |
+| RTK Query | RTK 自带的接口数据请求和缓存工具，处理加载状态、缓存和重新请求 |
+| Redux DevTools | 查看分发的 action、payload 和每一步状态变化 |
+
+`createAsyncThunk` 适合描述一段异步流程，并由业务代码决定结果写到哪个状态字段。RTK Query 适合把接口数据的请求和缓存交给统一机制管理。
+
+参考：[Redux 基础概念](https://redux.js.org/tutorials/essentials/part-1-overview-concepts)、[Redux Toolkit 入门](https://redux-toolkit.js.org/introduction/getting-started)、[React Redux Hooks](https://react-redux.js.org/api/hooks)、[createAsyncThunk](https://redux-toolkit.js.org/api/createAsyncThunk)、[RTK Query](https://redux-toolkit.js.org/rtk-query/overview)。
